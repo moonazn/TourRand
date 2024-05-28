@@ -13,7 +13,7 @@ import com.kakao.sdk.user.UserApiClient;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
-
+//hi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,16 +53,16 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void fetchUserInfo() {
-        UserApiClient.getInstance().me((user, throwable) -> {
-            if (throwable != null) {
-                Log.e(TAG, "사용자 정보 요청 실패", throwable);
-            } else if (user != null) {
-                Log.i(TAG, "사용자 정보 요청 성공: " + user.toString());
-                // user 객체에 사용자 정보가 담겨 있습니다.
-                // 여기서 서버에 사용자 정보를 보내어 회원가입 처리를 할 수 있습니다.
-            }
-            return null;
-        });
-    }
+//    private void fetchUserInfo() {
+//        UserApiClient.getInstance().me((user, throwable) -> {
+//            if (throwable != null) {
+//                Log.e(TAG, "사용자 정보 요청 실패", throwable);
+//            } else if (user != null) {
+//                Log.i(TAG, "사용자 정보 요청 성공: " + user.toString());
+//                // user 객체에 사용자 정보가 담겨 있습니다.
+//                // 여기서 서버에 사용자 정보를 보내어 회원가입 처리를 할 수 있습니다.
+//            }
+//            return null;
+//        });
+//    }
 }
