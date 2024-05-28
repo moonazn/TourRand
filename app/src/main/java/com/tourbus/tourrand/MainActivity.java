@@ -14,6 +14,7 @@ import com.kakao.sdk.user.UserApiClient;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 //hi
+    //hello
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
