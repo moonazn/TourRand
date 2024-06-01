@@ -12,22 +12,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-<!--        <ImageView-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="80sp"-->
-<!--            android:src="@drawable/homegra3"-->
-<!--            android:scaleType="fitXY"-->
-<!--            app:layout_constraintBottom_toBottomOf="parent"/>-->
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@drawable/round_rectangle"
-            android:layout_marginBottom="-50dp"
-            android:layout_marginRight="26dp"
-            android:layout_marginLeft="26dp"
-            android:layout_marginTop="60dp" />
-
         <ImageView
             android:id="@+id/icon"
             android:layout_width="60dp"
@@ -54,7 +38,7 @@
             android:layout_height="185sp"
             android:layout_marginTop="36dp"
             android:layout_marginRight="28dp"
-            android:src="@drawable/circle_gray1"
+            android:src="@drawable/circle_white"
             app:layout_constraintHorizontal_bias="0.454"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/icon" />
@@ -65,7 +49,7 @@
             android:layout_height="160sp"
             android:layout_marginLeft="28dp"
             android:layout_marginTop="408dp"
-            android:src="@drawable/circle_gray3"
+            android:src="@drawable/circle_white"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@id/icon" />
 
@@ -73,17 +57,17 @@
             android:id="@+id/circle4"
             android:layout_width="130sp"
             android:layout_height="130sp"
-            android:layout_marginLeft="212dp"
-            android:layout_marginTop="356dp"
-            android:src="@drawable/circle_grayblack"
+            android:layout_marginLeft="228dp"
+            android:layout_marginTop="340dp"
+            android:src="@drawable/circle_gray1"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/icon"/>
+            app:layout_constraintTop_toBottomOf="@id/icon" />
 
         <ImageView
             android:id="@+id/circle0"
             android:layout_width="200sp"
             android:layout_height="200sp"
-            android:src="@drawable/circle_pink"
+            android:src="@drawable/circle_red"
             app:layout_constraintTop_toBottomOf="@id/icon"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"

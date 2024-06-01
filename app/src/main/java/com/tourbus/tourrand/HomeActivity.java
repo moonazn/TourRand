@@ -15,6 +15,6 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         viewPager = findViewById(R.id.viewPager);
-        viewPager.setAdapter(new ViewPagerAdapter(this));
+        viewPager.setAdapter(new HomeViewPagerAdapter(this));
     }
 }
