@@ -7,75 +7,82 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
+import com.kakao.sdk.auth.model.OAuthToken;
 import com.kakao.sdk.common.model.AuthErrorCause;
 import com.kakao.sdk.user.UserApiClient;
+import com.kakao.sdk.user.model.User;
+
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
+import kotlin.jvm.functions.Function2;
 
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
+
+    private TextView id, email;
+    private Button logoutBtn;
+    private ImageView kakaoLoginButton;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ImageView kakaoLoginButton = findViewById(R.id.btn_kakao_login);
+        kakaoLoginButton = findViewById(R.id.btn_kakao_login);
+        logoutBtn = findViewById(R.id.logout);
+        id = findViewById(R.id.semiText);
+        email = findViewById(R.id.mainText);
+        progressBar = findViewById(R.id.progress_bar);
+
+        Function2<OAuthToken, Throwable, Unit> callback = new Function2<OAuthToken, Throwable, Unit>() {
+            @Override
+            public Unit invoke(OAuthToken oAuthToken, Throwable throwable) {
+                progressBar.setVisibility(View.GONE);
+                if (throwable != null) {
+                    Log.e(TAG, "로그인 실패", throwable);
+                    showLoginFailedDialog("로그인에 실패했습니다. 다시 시도해주세요.");
+                } else if (oAuthToken != null) {
+                    Log.i(TAG, "로그인 성공");
+                    updateKakaoLoginUi();
+                }
+                return null;
+            }
+        };
+
         kakaoLoginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Intent intent = new Intent(MainActivity.this, HomeActivity.class);
-//                startActivity(intent);
-//                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-//                finish();
+                if (UserApiClient.getInstance().isKakaoTalkLoginAvailable(MainActivity.this)) {
+                    UserApiClient.getInstance().loginWithKakaoTalk(MainActivity.this, callback);
+                } else {
+                    UserApiClient.getInstance().loginWithKakaoAccount(MainActivity.this, callback);
+                }
+            }
+        });
 
-                UserApiClient.getInstance().loginWithKakaoAccount(MainActivity.this, (oAuthToken, error) -> {
-                    if (error != null) {
-                        Log.e(TAG, "로그인 실패", error);
-                        if (error.toString().contains(AuthErrorCause.AccessDenied.toString())) {
-                            showLoginFailedDialog("로그인 권한이 거부되었습니다.");
-                        } else if (error.toString().contains(AuthErrorCause.InvalidClient.toString())) {
-                            showLoginFailedDialog("유효하지 않은 앱입니다.");
-                        } else if (error.toString().contains(AuthErrorCause.InvalidGrant.toString())) {
-                            showLoginFailedDialog("인증 수단이 유효하지 않습니다.");
-                        } else if (error.toString().contains(AuthErrorCause.InvalidRequest.toString())) {
-                            showLoginFailedDialog("요청 파라미터 오류입니다.");
-                        } else if (error.toString().contains(AuthErrorCause.InvalidScope.toString())) {
-                            showLoginFailedDialog("유효하지 않은 scope ID입니다.");
-                        } else if (error.toString().contains(AuthErrorCause.Misconfigured.toString())) {
-                            showLoginFailedDialog("설정이 올바르지 않습니다.");
-                        } else if (error.toString().contains(AuthErrorCause.ServerError.toString())) {
-                            showLoginFailedDialog("서버 내부 에러입니다.");
-                        } else if (error.toString().contains(AuthErrorCause.Unauthorized.toString())) {
-                            showLoginFailedDialog("앱에 요청 권한이 없습니다.");
-                        } else if (error.toString().contains("user cancelled.")) {
-                            showLoginFailedDialog("사용자가 로그인을 취소했습니다.");
-                        } else {
-                            showLoginFailedDialog("알 수 없는 오류가 발생했습니다. 다시 시도해주세요.");
-                        }
-                    } else if (oAuthToken != null) {
-                        Log.i(TAG, "로그인 성공");
-
-                        UserApiClient.getInstance().me((user, meError) -> {
-                            if (meError != null) {
-                                Log.e(TAG, "사용자 정보 요청 실패", meError);
-                            } else {
-                                Log.i(TAG, "사용자 정보 요청 성공: " + user.getKakaoAccount().getProfile().getNickname());
-
-                                Intent intent = new Intent(MainActivity.this, HomeActivity.class);
-                                startActivity(intent);
-                                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                                finish();
-                            }
-                            return null;
-                        });
+        logoutBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                UserApiClient.getInstance().logout(new Function1<Throwable, Unit>() {
+                    @Override
+                    public Unit invoke(Throwable throwable) {
+                        updateKakaoLoginUi();
+                        return null;
                     }
-                    return null;
                 });
             }
         });
+
+        updateKakaoLoginUi();
     }
+
     private void showLoginFailedDialog(String message) {
         new AlertDialog.Builder(this)
                 .setTitle("로그인 실패")
@@ -84,4 +91,29 @@ public class MainActivity extends AppCompatActivity {
                 .show();
     }
 
+    private void updateKakaoLoginUi() {
+        UserApiClient.getInstance().me(new Function2<User, Throwable, Unit>() {
+            @Override
+            public Unit invoke(User user, Throwable throwable) {
+                if (user != null) {
+                    id.setText("이름 : " + user.getId().toString());
+                    email.setText("이메일 : " + user.getKakaoAccount().getEmail());
+                    kakaoLoginButton.setVisibility(View.GONE);
+                    logoutBtn.setVisibility(View.VISIBLE);
+
+                    // 로그인 성공 시 다음 화면으로 이동
+                    Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+                    startActivity(intent);
+                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                    finish();
+                } else {
+                    id.setText(null);
+                    email.setText(null);
+                    kakaoLoginButton.setVisibility(View.VISIBLE);
+                    logoutBtn.setVisibility(View.GONE);
+                }
+                return null;
+            }
+        });
+    }
 }

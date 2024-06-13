@@ -15,9 +15,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TourRand"
         tools:targetApi="31">
-        <meta-data
+
+
+        <!--<meta-data
             android:name="com.kakao.sdk.AppKey"
-            android:value="@string/kakao_app_key"/>
+            android:value="@string/kakao_app_key"/>-->
         <activity
             android:name=".SplashActivity"
             android:theme="@style/SplashTheme"
@@ -33,11 +35,30 @@
         <activity
             android:name=".MainActivity"
             android:exported="true">
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
 
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-<!--            </intent-filter>-->
+                <!-- 처리할 URL 스킴 설정 -->
+                <data android:scheme="tourbus" />
+            </intent-filter>
+        </activity>
+        <activity android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:host="oauth"
+                    android:scheme="kakao{d71b70e03d7f7b494a72421fb46cba46}" />
+            </intent-filter>
+
+            <!--            <intent-filter>-->
+            <!--                <action android:name="android.intent.action.MAIN" />-->
+
+            <!--                <category android:name="android.intent.category.LAUNCHER" />-->
+            <!--            </intent-filter>-->
         </activity>
     </application>
 
