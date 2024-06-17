@@ -3,7 +3,7 @@ package com.tourbus.tourrand;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.widget.MediaController;
+import android.os.Handler;
 import android.widget.VideoView;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -14,25 +14,33 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
+        // VideoView 설정
         VideoView videoView = findViewById(R.id.videoView);
         Uri videoUri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.splash_white_72030);
-
-        // MediaController 설정 (옵션)
-        MediaController mediaController = new MediaController(this);
-        mediaController.setAnchorView(videoView);
-        videoView.setMediaController(mediaController);
-
         videoView.setVideoURI(videoUri);
-        videoView.setOnPreparedListener(mp -> {
-            mp.setLooping(false);  // 필요한 경우 루핑 설정
-            videoView.start();
-        });
 
-        videoView.setOnCompletionListener(mp -> {
-            Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-            startActivity(intent);
-            overridePendingTransition(R.anim.fade_in, R.anim.fade_out); // 화면 전환 애니메이션 제거
-            finish();
-        });
+        // 비디오 재생 시작
+        videoView.start();
+
+        // 3초 후 메인으로 이동
+        moveMain(2.5);
+    }
+
+    private void moveMain(double sec) {
+        int delayMillis = (int) (sec * 1000); // 초를 밀리초로 변환
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                // 새로운 Intent 생성
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+
+                // Intent에 명시된 액티비티로 이동
+                startActivity(intent);
+                overridePendingTransition(0, 0);
+
+                // 현재 액티비티 종료
+                finish();
+            }
+        }, delayMillis); // sec초 정도 딜레이를 준 후 시작
     }
 }
