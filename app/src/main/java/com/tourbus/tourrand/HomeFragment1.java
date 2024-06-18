@@ -1,21 +1,56 @@
 package com.tourbus.tourrand;
 
 import android.os.Bundle;
-import androidx.fragment.app.Fragment;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import com.tourbus.tourrand.R;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import java.util.ArrayList;
+import java.util.List;
 
 public class HomeFragment1 extends Fragment {
 
-    public HomeFragment1() {
-        // Required empty public constructor
-    }
+    private RecyclerView recyclerView;
+    private TripPlanAdapter adapter;
+    private List<TripPlan> tripPlans;
 
+    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_home1, container, false);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_home1, container, false);
+
+        // RecyclerView 초기화
+        recyclerView = rootView.findViewById(R.id.recycler_view_trip_plans);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        // 임시 데이터 생성 (실제 데이터는 네트워크 요청 또는 로컬 DB에서 가져와야 함)
+        tripPlans = new ArrayList<>();
+        tripPlans.add(new TripPlan("여행 이름 1", "2024-06-20", "2"));
+        tripPlans.add(new TripPlan("여행 이름 2", "2024-07-15", "30"));
+        tripPlans.add(new TripPlan("여행 이름 3", "2024-08-05", "50"));
+        tripPlans.add(new TripPlan("여행 이름 4", "2024-09-10", "90"));
+        tripPlans.add(new TripPlan("여행 이름 5", "2024-10-20", "120"));
+        tripPlans.add(new TripPlan("여행 이름 5", "2024-10-20", "120"));
+        tripPlans.add(new TripPlan("여행 이름 5", "2024-10-20", "120"));
+        tripPlans.add(new TripPlan("여행 이름 5", "2024-10-20", "120"));
+        tripPlans.add(new TripPlan("여행 이름 5", "2024-10-20", "120"));
+        tripPlans.add(new TripPlan("여행 이름 5", "2024-10-20", "120"));
+        tripPlans.add(new TripPlan("여행 이름 5", "2024-10-20", "120"));
+
+        // Adapter 설정
+        adapter = new TripPlanAdapter(getActivity(), tripPlans);
+        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), 2);
+        layoutManager.setOrientation(RecyclerView.VERTICAL);
+        recyclerView.setLayoutManager(layoutManager);
+
+        recyclerView.setAdapter(adapter);
+
+        return rootView;
     }
 }
