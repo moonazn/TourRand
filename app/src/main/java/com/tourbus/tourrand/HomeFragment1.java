@@ -1,10 +1,16 @@
 package com.tourbus.tourrand;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -19,6 +25,8 @@ public class HomeFragment1 extends Fragment {
     private RecyclerView recyclerView;
     private TripPlanAdapter adapter;
     private List<TripPlan> tripPlans;
+    private TextView shakeText1;
+    private TextView shakeText2;
 
     @Nullable
     @Override
@@ -50,6 +58,22 @@ public class HomeFragment1 extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
 
         recyclerView.setAdapter(adapter);
+
+        // 애니메이션 설정 및 시작
+        Animation shake = AnimationUtils.loadAnimation(getContext(), R.anim.shake);
+        shakeText1 = rootView.findViewById(R.id.shakeText1);
+        shakeText2 = rootView.findViewById(R.id.shakeText2);
+
+        rootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                new Handler().postDelayed(() -> {
+                    shakeText1.startAnimation(shake);
+                    shakeText2.startAnimation(shake);
+                }, 1000); // 1초 딜레이 추가
+                rootView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+            }
+        });
 
         return rootView;
     }
