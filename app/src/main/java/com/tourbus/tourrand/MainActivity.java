@@ -11,6 +11,8 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -18,11 +20,17 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.kakao.sdk.auth.model.OAuthToken;
-import com.kakao.sdk.common.model.AuthErrorCause;
 import com.kakao.sdk.user.UserApiClient;
 import com.kakao.sdk.user.model.User;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -35,9 +43,12 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
     private TextView id, email;
-    private Button logoutBtn;
-
     private ImageView kakaoLoginButton;
+    private Handler handler;
+
+    private  String inputText;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,11 +56,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         kakaoLoginButton = findViewById(R.id.btn_kakao_login);
-        logoutBtn = findViewById(R.id.logout);
         id = findViewById(R.id.semiText);
         email = findViewById(R.id.mainText);
 
-        Log.d("getKeyHash",""+getKeyHash(MainActivity.this));
+        handler = new Handler(Looper.getMainLooper());
 
         Function2<OAuthToken,Throwable, Unit> callback =new Function2<OAuthToken, Throwable, Unit>() {
             @Override
@@ -64,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
                 }else {
                     //로그인 실패
                     Log.e(TAG, "invoke: login fail" );
+                    showLoginFailedDialog("로그인 실패");
                 }
 
                 return null;
@@ -72,59 +83,24 @@ public class MainActivity extends AppCompatActivity {
         kakaoLoginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, HomeActivity.class);
-                startActivity(intent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                finish();
+//                Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+//                startActivity(intent);
+//                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+//                finish();
 
-//                if(UserApiClient.getInstance().isKakaoTalkLoginAvailable(MainActivity.this)){
-//                    UserApiClient.getInstance().loginWithKakaoTalk(MainActivity.this, callback);
-//                }else{
-//                    // 카카오톡이 설치되어 있지 않다면
-//                    UserApiClient.getInstance().loginWithKakaoAccount(MainActivity.this, callback);
-//                }
-
-            }
-
-
-        });
-        logoutBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                UserApiClient.getInstance().logout(new Function1<Throwable, Unit>() {
-                    @Override
-                    public Unit invoke(Throwable throwable) {
-                        updateKakaoLoginUi();
-                        return null;
-                    }
-                });
-            }
-        });
-        updateKakaoLoginUi();
-
-
-    }
-    public static String getKeyHash(final Context context){
-        PackageManager pm = context.getPackageManager();
-        try {
-            PackageInfo packageInfo = pm.getPackageInfo(context.getPackageName(),PackageManager.GET_SIGNATURES);
-            if(packageInfo == null)
-                return null;
-
-            for(Signature signature : packageInfo.signatures){
-                try {
-                    MessageDigest md = MessageDigest.getInstance("SHA");
-                    md.update(signature.toByteArray());
-                    return encodeToString(md.digest(), Base64.NO_WRAP);
-                } catch (NoSuchAlgorithmException e){
-                    e.printStackTrace();
+                if(UserApiClient.getInstance().isKakaoTalkLoginAvailable(MainActivity.this)){
+                    UserApiClient.getInstance().loginWithKakaoTalk(MainActivity.this, callback);
+                }else{
+                    // 카카오톡이 설치되어 있지 않다면
+                    UserApiClient.getInstance().loginWithKakaoAccount(MainActivity.this, callback);
                 }
             }
-        } catch (PackageManager.NameNotFoundException e){
-            e.printStackTrace();
-        }
-        return null;
+
+
+        });
+
     }
+
     private void showLoginFailedDialog(String message) {
         new AlertDialog.Builder(this)
                 .setTitle("로그인 실패")
@@ -133,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
                 .show();
     }
 
-    private void updateKakaoLoginUi() {
+    public void updateKakaoLoginUi() {
 
         // 로그인 여부에 따른 UI 설정
         UserApiClient.getInstance().me(new Function2<User, Throwable, Unit>() {
@@ -142,45 +118,141 @@ public class MainActivity extends AppCompatActivity {
 
                 if (user != null) {
 
+                    SplashActivity.currentUser = new AppUser(user.getId().toString(),
+                            user.getKakaoAccount().getProfile().getNickname(),
+                            user.getKakaoAccount().getEmail(),
+                            user.getKakaoAccount().getProfile().getProfileImageUrl());
                     // 유저의 아이디
-                    Log.d(TAG, "invoke: id =" + user.getId());
+                    Log.d("id", "invoke: id =" + user.getId());
                     // 유저의 이메일
-                    Log.d(TAG, "invoke: email =" + user.getKakaoAccount().getEmail());
+                    Log.d("email", "invoke: email =" + user.getKakaoAccount().getEmail());
                     // 유저의 닉네임
-                    Log.d(TAG, "invoke: nickname =" + user.getKakaoAccount().getProfile().getNickname());
-                    // 유저의 성별
-                    //Log.d(TAG, "invoke: gender =" + user.getKakaoAccount().getGender());
-                    // 유저의 연령대
-                    //Log.d(TAG, "invoke: age=" + user.getKakaoAccount().getAgeRange());
+                    Log.d("name", "invoke: nickname =" + user.getKakaoAccount().getProfile().getNickname());
 
+//                    //유저 프로필 사진
+//                    Glide.with(profileImage).load(user.getKakaoAccount().
+//                            getProfile().getProfileImageUrl()).circleCrop().into(profileImage);
+                    Log.d("사진 url", user.getKakaoAccount().
+                            getProfile().getProfileImageUrl());
 
-                    // 유저 닉네임 세팅해주기
-                    id.setText("이름 : " + user.getId().toString());
-                    // 유저 프로필 사진 세팅해주기
-                    email.setText("이메일 : " + user.getKakaoAccount().getEmail());
-                    Log.d(TAG, "invoke: profile = "+user.getKakaoAccount().getProfile().getThumbnailImageUrl());
+//                    id.setText(user.getId().toString());
 
-                    // 로그인이 되어있으면
-                    kakaoLoginButton.setVisibility(View.GONE);
-                    logoutBtn.setVisibility(View.VISIBLE);
+                    Log.d(TAG, "invoke: profile = " + user.getKakaoAccount().getProfile().getThumbnailImageUrl());
+
+                    String url = "http://13.209.33.141:5000";
+//                    //10자리 숫자/이메일/이름/프로필 사진 주소
+                    inputText = user.getId().toString()+"^^"+user.getKakaoAccount().getEmail().toString()+"^^"+
+                            user.getKakaoAccount().getProfile().getNickname()+"^^"+user.getKakaoAccount().getProfile().getThumbnailImageUrl().toString();
+
+                    String data = "{ \"content\" : \""+inputText+"\" }";; //json 형식 데이터
+
+                    new Thread(() -> {
+                        String result = httpPostBodyConnection(url, data);
+                        // 처리 결과 확인
+                        handler.post(() -> seeNetworkResult(result));
+                    }).start();
+
                     Intent intent = new Intent(MainActivity.this, HomeActivity.class);
                     startActivity(intent);
                     overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     finish();
 
                 } else {
-                    // 로그인 되어있지 않으면
-                    //id.setText(null);
-                    //email.setText(null);
+                     //로그인 되어있지 않으면
+                    id.setText(null);
+                    email.setText(null);
 
                     kakaoLoginButton.setVisibility(View.VISIBLE);
-                    logoutBtn.setVisibility(View.VISIBLE);
-
 
                 }
                 return null;
             }
         });
     }
+    private String httpPostBodyConnection(String UrlData, String ParamData) {
+        // 이전과 동일한 네트워크 연결 코드를 그대로 사용합니다.
+        // 백그라운드 스레드에서 실행되기 때문에 메인 스레드에서는 문제가 없습니다.
+
+        String totalUrl = "";
+        totalUrl = UrlData.trim().toString();
+
+        //http 통신을 하기위한 객체 선언 실시
+        URL url = null;
+        HttpURLConnection conn = null;
+
+        //http 통신 요청 후 응답 받은 데이터를 담기 위한 변수
+        String responseData = "";
+        BufferedReader br = null;
+        StringBuffer sb = null;
+
+        //메소드 호출 결과값을 반환하기 위한 변수
+        String returnData = "";
+
+
+        try {
+            //파라미터로 들어온 url을 사용해 connection 실시
+            url = null;
+            url = new URL(totalUrl);
+            conn = null;
+            conn = (HttpURLConnection) url.openConnection();
+
+            //http 요청에 필요한 타입 정의 실시
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json; utf-8"); //post body json으로 던지기 위함
+            conn.setRequestProperty("Accept", "application/json");
+            conn.setDoOutput(true); //OutputStream을 사용해서 post body 데이터 전송
+            try (OutputStream os = conn.getOutputStream()) {
+                byte request_data[] = ParamData.getBytes("utf-8");
+                Log.d("TAGGG",request_data.toString());
+                os.write(request_data);
+                //os.close();
+            } catch (Exception e) {
+                Log.d("TAG3","여기다");
+                e.printStackTrace();
+            }
+
+            //http 요청 실시
+            conn.connect();
+            System.out.println("http 요청 방식 : " + "POST BODY JSON");
+            System.out.println("http 요청 타입 : " + "application/json");
+            System.out.println("http 요청 주소 : " + UrlData);
+            System.out.println("http 요청 데이터 : " + ParamData);
+            System.out.println("");
+
+            //http 요청 후 응답 받은 데이터를 버퍼에 쌓는다
+            br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+            sb = new StringBuffer();
+            while ((responseData = br.readLine()) != null) {
+                sb.append(responseData); //StringBuffer에 응답받은 데이터 순차적으로 저장 실시
+            }
+
+            //메소드 호출 완료 시 반환하는 변수에 버퍼 데이터 삽입 실시
+            returnData = sb.toString();
+            Log.d("TAG2", returnData);
+            //http 요청 응답 코드 확인 실시
+            String responseCode = String.valueOf(conn.getResponseCode());
+            System.out.println("http 응답 코드 : " + responseCode);
+            System.out.println("http 응답 데이터 : " + returnData);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            //http 요청 및 응답 완료 후 BufferedReader를 닫아줍니다
+            try {
+                if (br != null) {
+                    br.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return returnData; // 네트워크 요청 결과를 반환
+    }
+    private void seeNetworkResult(String result) {
+        // 네트워크 작업 완료 후
+        Log.d(result, "network");
+    }
 
 }
+

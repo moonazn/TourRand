@@ -1,5 +1,6 @@
 package com.tourbus.tourrand;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Gravity;
@@ -9,6 +10,7 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -17,8 +19,14 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.kakao.sdk.user.UserApiClient;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
 
 public class HomeFragment1 extends Fragment {
 
@@ -27,6 +35,7 @@ public class HomeFragment1 extends Fragment {
     private List<TripPlan> tripPlans;
     private TextView shakeText1;
     private TextView shakeText2;
+    private Button logoutBtn;
 
     @Nullable
     @Override
@@ -72,6 +81,30 @@ public class HomeFragment1 extends Fragment {
                     shakeText2.startAnimation(shake);
                 }, 1000); // 1초 딜레이 추가
                 rootView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+            }
+        });
+
+        System.out.println("email = " + SplashActivity.currentUser.getEmail());
+
+        logoutBtn = rootView.findViewById(R.id.logout);
+        logoutBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                UserApiClient.getInstance().logout(new Function1<Throwable, Unit>() {
+                    @Override
+                    public Unit invoke(Throwable throwable) {
+                        SplashActivity.currentUser.deleteUser();
+                        System.out.println("currentUser deleted");
+
+
+                        Intent intent = new Intent(getActivity(), MainActivity.class);
+                        startActivity(intent);
+//                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+//                        finish();
+
+                        return null;
+                    }
+                });
             }
         });
 
