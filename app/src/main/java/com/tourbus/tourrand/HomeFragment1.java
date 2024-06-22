@@ -11,6 +11,7 @@ import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -36,6 +37,8 @@ public class HomeFragment1 extends Fragment {
     private TextView shakeText1;
     private TextView shakeText2;
     private Button logoutBtn;
+    private Button plusBtn;
+    private ImageView mypageBtn;
 
     @Nullable
     @Override
@@ -84,9 +87,11 @@ public class HomeFragment1 extends Fragment {
             }
         });
 
-        System.out.println("email = " + SplashActivity.currentUser.getEmail());
+//        System.out.println("email = " + SplashActivity.currentUser.getEmail());
 
         logoutBtn = rootView.findViewById(R.id.logout);
+        mypageBtn = rootView.findViewById(R.id.mypage);
+        plusBtn = rootView.findViewById(R.id.plusBut);
         logoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -105,6 +110,22 @@ public class HomeFragment1 extends Fragment {
                         return null;
                     }
                 });
+            }
+        });
+
+        mypageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), MyPageActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        plusBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), QuestionActivity.class);
+                startActivity(intent);
             }
         });
 
