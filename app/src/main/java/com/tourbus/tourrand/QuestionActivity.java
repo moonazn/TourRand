@@ -5,10 +5,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 public class QuestionActivity extends AppCompatActivity {
 
-    private View aBtn, bBtn, back;
+    private View aBtn, bBtn;
+    private ImageView back;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,12 +24,16 @@ public class QuestionActivity extends AppCompatActivity {
         bBtn = findViewById(R.id.bBtn);
         back = findViewById(R.id.back);
 
+        Animation animation = AnimationUtils.loadAnimation(this, R.anim.slide_in_row);
+        aBtn.startAnimation(animation);
+        bBtn.startAnimation(animation);
+
+
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(QuestionActivity.this, HomeActivity.class);
                 startActivity(intent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 finish();
             }
         });

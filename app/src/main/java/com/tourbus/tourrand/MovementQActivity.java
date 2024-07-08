@@ -26,7 +26,7 @@ public class MovementQActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MovementQActivity.this, DepartureQActivity.class);
                 startActivity(intent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                overridePendingTransition(0, 0);
                 finish();
             }
         });
@@ -36,7 +36,7 @@ public class MovementQActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MovementQActivity.this, DstActivity.class);
                 startActivity(intent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                overridePendingTransition(0, 0);
                 finish();
             }
         });

@@ -36,9 +36,10 @@ public class HomeFragment1 extends Fragment {
     private List<TripPlan> tripPlans;
     private TextView shakeText1;
     private TextView shakeText2;
-    private Button logoutBtn;
-    private Button plusBtn;
+    private TextView plusBtn;
     private ImageView mypageBtn;
+
+    private TextView tripzero;
 
     @Nullable
     @Override
@@ -51,25 +52,37 @@ public class HomeFragment1 extends Fragment {
 
         // 임시 데이터 생성 (실제 데이터는 네트워크 요청 또는 로컬 DB에서 가져와야 함)
         tripPlans = new ArrayList<>();
-        tripPlans.add(new TripPlan("여행 이름 1", "2024-06-20", "2"));
-        tripPlans.add(new TripPlan("여행 이름 2", "2024-07-15", "30"));
-        tripPlans.add(new TripPlan("여행 이름 3", "2024-08-05", "50"));
-        tripPlans.add(new TripPlan("여행 이름 4", "2024-09-10", "90"));
-        tripPlans.add(new TripPlan("여행 이름 5", "2024-10-20", "120"));
-        tripPlans.add(new TripPlan("여행 이름 5", "2024-10-20", "120"));
-        tripPlans.add(new TripPlan("여행 이름 5", "2024-10-20", "120"));
-        tripPlans.add(new TripPlan("여행 이름 5", "2024-10-20", "120"));
-        tripPlans.add(new TripPlan("여행 이름 5", "2024-10-20", "120"));
-        tripPlans.add(new TripPlan("여행 이름 5", "2024-10-20", "120"));
-        tripPlans.add(new TripPlan("여행 이름 5", "2024-10-20", "120"));
+//        tripPlans.add(new TripPlan("여행 이름 1", "2024-06-20 ~ 2024-07-01", "2"));
+//        tripPlans.add(new TripPlan("여행 이름 2", "2024-06-20 ~ 2024-07-01", "30"));
+//        tripPlans.add(new TripPlan("여행 이름 3", "2024-06-20 ~ 2024-07-01", "50"));
+//        tripPlans.add(new TripPlan("여행 이름 4", "2024-06-20 ~ 2024-07-01", "90"));
+//        tripPlans.add(new TripPlan("여행 이름 5", "2024-06-20 ~ 2024-07-01", "120"));
+//        tripPlans.add(new TripPlan("여행 이름 5", "2024-06-20 ~ 2024-07-01", "120"));
+//        tripPlans.add(new TripPlan("여행 이름 5", "2024-06-20 ~ 2024-07-01", "120"));
+//        tripPlans.add(new TripPlan("여행 이름 5", "2024-06-20 ~ 2024-07-01", "120"));
+//        tripPlans.add(new TripPlan("여행 이름 5", "2024-06-20 ~ 2024-07-01", "120"));
 
-        // Adapter 설정
-        adapter = new TripPlanAdapter(getActivity(), tripPlans);
-        GridLayoutManager layoutManager = new GridLayoutManager(getActivity(), 2);
-        layoutManager.setOrientation(RecyclerView.VERTICAL);
-        recyclerView.setLayoutManager(layoutManager);
+        tripzero = rootView.findViewById(R.id.tripzero);
 
-        recyclerView.setAdapter(adapter);
+        if(tripPlans.size() == 0) {
+            tripzero.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+        } else {
+            tripzero.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+
+            // Adapter 설정
+            adapter = new TripPlanAdapter(getActivity(), tripPlans);
+
+            // GridLayoutManager 설정
+            LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
+            layoutManager.setOrientation(RecyclerView.VERTICAL);
+
+            // RecyclerView에 LayoutManager와 Adapter 설정
+            recyclerView.setLayoutManager(layoutManager);
+            recyclerView.setAdapter(adapter);
+
+        }
 
         // 애니메이션 설정 및 시작
         Animation shake = AnimationUtils.loadAnimation(getContext(), R.anim.shake);
@@ -89,29 +102,8 @@ public class HomeFragment1 extends Fragment {
 
 //        System.out.println("email = " + SplashActivity.currentUser.getEmail());
 
-        logoutBtn = rootView.findViewById(R.id.logout);
         mypageBtn = rootView.findViewById(R.id.mypage);
         plusBtn = rootView.findViewById(R.id.plusBut);
-        logoutBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                UserApiClient.getInstance().logout(new Function1<Throwable, Unit>() {
-                    @Override
-                    public Unit invoke(Throwable throwable) {
-                        SplashActivity.currentUser.deleteUser();
-                        System.out.println("currentUser deleted");
-
-
-                        Intent intent = new Intent(getActivity(), MainActivity.class);
-                        startActivity(intent);
-//                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-//                        finish();
-
-                        return null;
-                    }
-                });
-            }
-        });
 
         mypageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -125,6 +117,7 @@ public class HomeFragment1 extends Fragment {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getActivity(), QuestionActivity.class);
+//                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 startActivity(intent);
             }
         });

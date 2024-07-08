@@ -20,4 +20,8 @@
         <item name="android:windowBackground">@drawable/back</item>
         <item name="android:windowDisablePreview">true</item>
     </style>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="android:scrollbarThumbVertical">@drawable/scrollbar_vertical_thumb</item>
+    </style>
 </resources>

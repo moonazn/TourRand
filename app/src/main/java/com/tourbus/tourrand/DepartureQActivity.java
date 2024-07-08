@@ -26,7 +26,7 @@ public class DepartureQActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(DepartureQActivity.this, AnimalQActivity.class);
                 startActivity(intent);
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                overridePendingTransition(0, 0);
                 finish();
             }
         });

@@ -42,7 +42,6 @@ import kotlin.jvm.functions.Function2;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
-    private TextView id, email;
     private ImageView kakaoLoginButton;
     private Handler handler;
 
@@ -56,8 +55,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         kakaoLoginButton = findViewById(R.id.btn_kakao_login);
-        id = findViewById(R.id.semiText);
-        email = findViewById(R.id.mainText);
 
         handler = new Handler(Looper.getMainLooper());
 
@@ -191,9 +188,7 @@ public class MainActivity extends AppCompatActivity {
                     finish();
 
                 } else {
-                     //로그인 되어있지 않으면
-                    id.setText(null);
-                    email.setText(null);
+
 
                     kakaoLoginButton.setVisibility(View.VISIBLE);
 

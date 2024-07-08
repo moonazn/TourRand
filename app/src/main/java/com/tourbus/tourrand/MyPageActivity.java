@@ -2,16 +2,23 @@ package com.tourbus.tourrand;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.kakao.sdk.user.UserApiClient;
+
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
 
 public class MyPageActivity extends AppCompatActivity {
 
     private TextView name, email;
     private ImageView profileImg;
+    private TextView logout;
 
     boolean isPopupOn = false;
 
@@ -31,5 +38,27 @@ public class MyPageActivity extends AppCompatActivity {
                 .circleCrop().into(profileImg);
 
 
+        logout = findViewById(R.id.logout);
+
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                UserApiClient.getInstance().logout(new Function1<Throwable, Unit>() {
+                    @Override
+                    public Unit invoke(Throwable throwable) {
+                        SplashActivity.currentUser.deleteUser();
+                        System.out.println("currentUser deleted");
+
+
+                        Intent intent = new Intent(MyPageActivity.this, HomeActivity.class);
+                        startActivity(intent);
+//                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+//                        finish();
+
+                        return null;
+                    }
+                });
+            }
+        });
     }
 }

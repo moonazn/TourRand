@@ -4,6 +4,8 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,6 +16,8 @@ public class TripPlanAdapter extends RecyclerView.Adapter<TripPlanViewHolder> {
 
     private Context context;
     private List<TripPlan> tripPlanList;
+
+    int lastPosition = -1;
 
     public TripPlanAdapter(Context context, List<TripPlan> tripPlanList) {
         this.context = context;
@@ -29,8 +33,14 @@ public class TripPlanAdapter extends RecyclerView.Adapter<TripPlanViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull TripPlanViewHolder holder, int position) {
-        TripPlan tripPlan = tripPlanList.get(position);
-        holder.bind(tripPlan);
+
+        if(holder.getAdapterPosition() > lastPosition){
+            Animation animation = AnimationUtils.loadAnimation(context, R.anim.slide_in_row);
+            ((TripPlanViewHolder) holder).itemView.startAnimation(animation);
+
+            TripPlan tripPlan = tripPlanList.get(position);
+            holder.bind(tripPlan);
+        }
     }
 
     @Override
